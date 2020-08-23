@@ -10,7 +10,10 @@ const useGetData = () => {
     const getData = async function () {
         try {
             const response = await fetch(
-                "http://api.open-notify.org/iss-now.json"
+                "http://api.open-notify.org/iss-now.json",
+                {
+                    credentials: "omit",
+                }
             );
             const issPos = await response.json();
             setissData(issPos);

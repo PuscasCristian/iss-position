@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import L from "leaflet";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-// import useGetData from "../hooks/useGetData";
-// import useGetAstros from "../hooks/useGetAstros";
+import useGetData from "../hooks/useGetData";
+import useGetAstros from "../hooks/useGetAstros";
 
 const Icon = L.icon({
     iconUrl: "http://open-notify.org//Open-Notify-API/map/ISSIcon.png",
@@ -12,45 +12,8 @@ const Icon = L.icon({
 });
 
 const MapComp = () => {
-    const [count, setCount] = useState(0);
-    const [issData, setissData] = useState();
-
-    // const { issData } = useGetData(); // custom hook get iss position
-    // const { astro } = useGetAstros(); // custom hook get astronauts data
-    const [astro, setAstro] = useState();
-    setTimeout(() => {
-        setCount(count + 1);
-    }, 1000);
-    const getData = async function () {
-        try {
-            const response = await fetch(
-                "http://api.open-notify.org/iss-now.json"
-            );
-            const issPos = await response.json();
-            setissData(issPos);
-        } catch (err) {
-            console.log("Opps", err);
-        }
-    };
-    const getAstros = async function () {
-        try {
-            const response = await fetch(
-                "http://api.open-notify.org/astros.json"
-            );
-            const issAstro = await response.json();
-            setAstro(issAstro);
-        } catch (err) {
-            console.log("Couldn't get astronauts data", err);
-        }
-    };
-    useEffect(() => {
-        getData();
-        getAstros();
-        return () => {
-            getData();
-            getAstros();
-        };
-    }, [count]);
+    const { issData } = useGetData(); // custom hook get iss position
+    const { astro } = useGetAstros(); // custom hook get astronauts data
 
     const [location, setLocation] = useState({
         location: {

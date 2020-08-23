@@ -5,12 +5,15 @@ const useGetAstros = () => {
     const [astro, setAstro] = useState();
     setTimeout(() => {
         setCount(count + 1);
-    }, 5000);
+    }, 1000);
 
     const getAstros = async function () {
         try {
             const response = await fetch(
-                "http://api.open-notify.org/astros.json"
+                "http://api.open-notify.org/astros.json",
+                {
+                    credentials: "omit",
+                }
             );
             const issAstro = await response.json();
             setAstro(issAstro);
