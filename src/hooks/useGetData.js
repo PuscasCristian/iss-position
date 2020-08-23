@@ -13,6 +13,7 @@ const useGetData = () => {
                 "http://api.open-notify.org/iss-now.json",
                 {
                     credentials: "omit",
+                    guard: "none",
                 }
             );
             const issPos = await response.json();

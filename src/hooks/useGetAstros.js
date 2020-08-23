@@ -13,6 +13,7 @@ const useGetAstros = () => {
                 "http://api.open-notify.org/astros.json",
                 {
                     credentials: "omit",
+                    guard: "none",
                 }
             );
             const issAstro = await response.json();
