@@ -20,13 +20,9 @@ const MapComp = () => {
     const [previousLocation, setPreviousLocation] = useState([]);
     const [issData, setissData] = useState();
     const [location, setLocation] = useState({
-        location: {
-            lat: 1.774,
-            lng: 2.703,
-        },
         zoom: 4,
     });
-    const [markers, setMarkers] = useState({ lat: 44, lng: 24 });
+    const [markers, setMarkers] = useState();
     const [popup, setPopup] = useState();
 
     useEffect(() => {
@@ -44,7 +40,7 @@ const MapComp = () => {
 
         setInterval(function () {
             getData();
-        }, 5000);
+        }, 2500);
     }, []);
     useEffect(() => {
         const checkInput = () => {
