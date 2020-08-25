@@ -12,10 +12,10 @@ const useGetData = () => {
             const response = await fetch(
                 "http://api.open-notify.org/iss-now.json",
                 {
-                    credentials: "omit",
-                    guard: "none",
+                    mode: "cors",
                 }
             );
+            console.log(response);
             const issPos = await response.json();
             setissData(issPos);
         } catch (err) {
