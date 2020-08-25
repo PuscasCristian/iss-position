@@ -12,7 +12,7 @@ const useGetData = () => {
             const response = await fetch(
                 "http://api.open-notify.org/iss-now.json",
                 {
-                    mode: "cors",
+                    mode: "no-cors",
                 }
             );
             const issPos = await response.json();

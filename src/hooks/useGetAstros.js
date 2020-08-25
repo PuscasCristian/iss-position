@@ -12,7 +12,7 @@ const useGetAstros = () => {
             const response = await fetch(
                 "http://api.open-notify.org/astros.json",
                 {
-                    mode: "cors",
+                    mode: "no-cors",
                 }
             );
             const issAstro = await response.json();
