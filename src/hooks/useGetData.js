@@ -15,7 +15,6 @@ const useGetData = () => {
                     mode: "cors",
                 }
             );
-            console.log(response);
             const issPos = await response.json();
             setissData(issPos);
         } catch (err) {
