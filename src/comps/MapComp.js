@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import L from "leaflet";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-import useGetData from "../hooks/useGetData";
-import useGetAstros from "../hooks/useGetAstros";
 
 const Icon = L.icon({
     iconUrl: "http://open-notify.org//Open-Notify-API/map/ISSIcon.png",
@@ -10,11 +8,17 @@ const Icon = L.icon({
     iconAnchor: [25, 15],
     popupAnchor: [0, -30],
 });
+const Dot = L.icon({
+    iconUrl:
+        "https://upload.wikimedia.org/wikipedia/commons/0/0e/Basic_red_dot.png",
+    iconSize: [5, 5],
+    iconAnchor: [5, 5],
+    popupAnchor: [0, -30],
+});
 
 const MapComp = () => {
-    const { issData } = useGetData(); // custom hook get iss position
-    const { astro } = useGetAstros(); // custom hook get astronauts data
-
+    const [previousLocation, setPreviousLocation] = useState([]);
+    const [issData, setissData] = useState();
     const [location, setLocation] = useState({
         location: {
             lat: 1.774,
@@ -22,31 +26,62 @@ const MapComp = () => {
         },
         zoom: 4,
     });
-    const [markers, setMarkers] = useState();
+    const [markers, setMarkers] = useState({ lat: 44, lng: 24 });
     const [popup, setPopup] = useState();
 
     useEffect(() => {
-        if (issData) {
-            setMarkers({
-                lat: issData.iss_position.latitude,
-                lng: issData.iss_position.longitude,
-            });
-            setLocation({
-                location: {
-                    lat: issData.iss_position.latitude,
-                    lng: issData.iss_position.longitude,
-                },
-            });
-        }
-    }, [issData]);
+        const getData = async function () {
+            try {
+                const response = await fetch(
+                    "https://api.wheretheiss.at/v1/satellites/25544"
+                );
+                const issPos = await response.json();
+                setissData(issPos);
+            } catch (err) {
+                console.log("Opps", err);
+            }
+        };
+
+        setInterval(function () {
+            getData();
+        }, 5000);
+    }, []);
     useEffect(() => {
-        if (astro) {
-            setPopup({
-                number: astro.number,
-                people: astro.people.map((ppl) => ppl.name),
-            });
-        }
-    }, [astro]);
+        const checkInput = () => {
+            if (issData) {
+                setMarkers({
+                    lat: issData.latitude,
+                    lng: issData.longitude,
+                });
+                setLocation({
+                    location: {
+                        lat: issData.latitude,
+                        lng: issData.longitude,
+                    },
+                });
+                setPopup({
+                    altitude: issData.altitude.toFixed(2),
+                    speed: issData.velocity.toFixed(0),
+                    visibility: issData.visibility,
+                });
+            }
+        };
+        const previousLoc = function () {
+            if (issData) {
+                let currentLoc = {
+                    lat: issData.latitude,
+                    lng: issData.longitude,
+                    id: issData.timestamp,
+                };
+                setPreviousLocation([...previousLocation, currentLoc]);
+            }
+        };
+        checkInput();
+        previousLoc();
+        return () => {
+            checkInput();
+        };
+    }, [issData]);
 
     return (
         <Map className='map-wrapper' center={markers} zoom={location.zoom}>
@@ -55,26 +90,25 @@ const MapComp = () => {
                 url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
             />
             {markers && (
-                <div>
-                    <Marker className='marker' position={markers} icon={Icon}>
-                        <Popup>
-                            {popup && (
-                                <div>
-                                    <h4>
-                                        There are currently {popup.number}{" "}
-                                        people on ISS craft right now. <br />
-                                    </h4>
-                                    <ul>
-                                        {popup.people.map((name) => (
-                                            <li key={name.length}>{name}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </Popup>
-                    </Marker>
-                </div>
+                <Marker className='marker' position={markers} icon={Icon}>
+                    <Popup>
+                        {popup && (
+                            <div>
+                                <p>
+                                    The ISS Craft is {popup.altitude}{" "}
+                                    Killometers above us, flying at a speed of{" "}
+                                    {popup.speed} Km/h. The ISS Space Station is
+                                    currently in {popup.visibility}.
+                                </p>
+                            </div>
+                        )}
+                    </Popup>
+                </Marker>
             )}
+            {previousLocation &&
+                previousLocation.map((position, index) => (
+                    <Marker position={position} key={index} icon={Dot}></Marker>
+                ))}
         </Map>
     );
 };
